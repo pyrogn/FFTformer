@@ -8,6 +8,7 @@ from basicsr.models.archs.fftformer_arch import (
     TransformerBlock,
     Upsample,
     Fuse,
+    Downsample,
 )
 
 

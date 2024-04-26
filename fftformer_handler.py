@@ -1,4 +1,6 @@
 import io
+import base64
+from io import BytesIO
 import os
 import torch
 import torch.nn as nn
@@ -85,17 +87,20 @@ class FFTformerHandler(BaseHandler):
 
     def postprocess(self, inference_output):
         """
-        Postprocessing involves converting the model output tensors to image format.
+        Postprocessing involves converting the model output tensors to base64-encoded strings.
         :param inference_output: Inference output.
         :return: Postprocessed inference output.
         """
-        # Convert the output tensor to an image
-        images = []
+        # Convert the output tensor to base64-encoded strings
+        output_data = []
         for tensor in inference_output:
             image = transforms.ToPILImage()(tensor.cpu().squeeze(0))
-            images.append(image)
+            buffered = BytesIO()
+            image.save(buffered, format="PNG")
+            base64_img = base64.b64encode(buffered.getvalue()).decode("utf-8")
+            output_data.append(base64_img)
 
-        return images
+        return output_data
 
 
 # model = fftformer()

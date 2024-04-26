@@ -72,6 +72,11 @@ class FFTformerHandler(BaseHandler):
         :param inputs: Preprocessed input data.
         :return: Model prediction output.
         """
+        # Pad the input tensor to a compatible size
+        pad_h = (8 - inputs.shape[2] % 8) % 8
+        pad_w = (8 - inputs.shape[3] % 8) % 8
+        inputs = torch.nn.functional.pad(inputs, (0, pad_w, 0, pad_h))
+
         # Run inference
         with torch.no_grad():
             outputs = self.model(inputs)

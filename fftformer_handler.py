@@ -8,7 +8,7 @@ from PIL import Image
 from ts.torch_handler.base_handler import BaseHandler
 
 # Import your model definition
-from basicsr.models.archs.fftformer_arch import fftformer
+from basicsr.models.archs.fftformer_only import fftformer
 
 
 class FFTformerHandler(BaseHandler):

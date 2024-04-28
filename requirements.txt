@@ -12,5 +12,5 @@ tb-nightly
 tqdm
 einops
 yapf
-torch==1.11
+torch
 torchvision

@@ -3,8 +3,6 @@ import base64
 from io import BytesIO
 import os
 import torch
-import torch.nn as nn
-from torch.autograd import Variable
 from torchvision import transforms
 from PIL import Image
 from ts.torch_handler.base_handler import BaseHandler
@@ -75,9 +73,10 @@ class FFTformerHandler(BaseHandler):
         :return: Model prediction output.
         """
         # Pad the input tensor to a compatible size
-        pad_h = (8 - inputs.shape[2] % 8) % 8
-        pad_w = (8 - inputs.shape[3] % 8) % 8
-        inputs = torch.nn.functional.pad(inputs, (0, pad_w, 0, pad_h))
+        pad_size = 32
+        pad_h = (pad_size - inputs.shape[2] % pad_size) % pad_size
+        pad_w = (pad_size - inputs.shape[3] % pad_size) % pad_size
+        inputs = torch.nn.functional.pad(inputs, (0, pad_w, 0, pad_h), mode="reflect")
 
         # Run inference
         with torch.no_grad():
@@ -101,40 +100,3 @@ class FFTformerHandler(BaseHandler):
             output_data.append(base64_img)
 
         return output_data
-
-
-# model = fftformer()
-
-
-# def entry_point_function_name(data, context):
-#     """
-#     Works on data and context to create model object or process inference request.
-#     Following sample demonstrates how model object can be initialized for jit mode.
-#     Similarly you can do it for eager mode models.
-#     :param data: Input data for prediction
-#     :param context: context contains model server system properties
-#     :return: prediction output
-#     """
-#     global model
-
-#     if not data:
-#         manifest = context.manifest
-
-#         properties = context.system_properties
-#         model_dir = properties.get("model_dir")
-#         device = torch.device(
-#             "cuda:" + str(properties.get("gpu_id"))
-#             if torch.cuda.is_available()
-#             else "cpu"
-#         )
-
-#         # Read model serialize/pt file
-#         serialized_file = manifest["model"]["serializedFile"]
-#         model_pt_path = os.path.join(model_dir, serialized_file)
-#         if not os.path.isfile(model_pt_path):
-#             raise RuntimeError("Missing the model.pt file")
-
-#         model = torch.jit.load(model_pt_path)
-#     else:
-#         # infer and return result
-#         return model(data)
